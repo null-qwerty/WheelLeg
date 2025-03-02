@@ -12,5 +12,6 @@ stm32_lock.h
 newlib_lock_glue.c
 startup_stm32h723xx.s
 STM32H723VGTx_FLASH.ld
+STM32H723XG_FLASH.ld
 
 doc/*.drawio
