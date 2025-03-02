@@ -45,6 +45,7 @@ add_subdirectory(cmake/stm32cubemx)
 
 # add PHOENIX library
 add_subdirectory(PHOENIX)
+add_subdirectory(Application)
 
 # Link directories setup
 target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
@@ -61,6 +62,11 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user defined include paths
     /usr/arm-linux-gnueabi/include
+    ${CMAKE_SOURCE_DIR}/Application/include
+    ${CMAKE_SOURCE_DIR}/PHOENIX/include
+    ${CMSISDSP}/Include
+    ${CMSISDSP}/PrivateInclude
+    ${CMSISDSP}/Include/dsp
 )
 
 # Add project symbols (macros)
@@ -71,8 +77,8 @@ target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE
 # Add linked libraries
 target_link_libraries(${CMAKE_PROJECT_NAME}
     stm32cubemx
-    phoenix
     # Add user defined libraries
+    application
 )
 
 add_custom_command(OUTPUT flash_target
