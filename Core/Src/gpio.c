@@ -53,12 +53,15 @@ void MX_GPIO_Init(void)
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOC, CS1_Accel_Pin|CS1_Gyro_Pin, GPIO_PIN_SET);
 
-  /*Configure GPIO pins : PCPin PCPin */
+  /*Configure GPIO pins : CS1_Accel_Pin CS1_Gyro_Pin */
   GPIO_InitStruct.Pin = CS1_Accel_Pin|CS1_Gyro_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+  /*AnalogSwitch Config */
+  HAL_SYSCFG_AnalogSwitchConfig(SYSCFG_SWITCH_PC3, SYSCFG_SWITCH_PC3_CLOSE);
 
 }
 
