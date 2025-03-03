@@ -62,6 +62,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user defined include paths
     /usr/arm-linux-gnueabi/include
+    /usr/arm-linux-gnueabi/include/c++/14.2.1
     ${CMAKE_SOURCE_DIR}/Application/include
     ${CMAKE_SOURCE_DIR}/PHOENIX/include
     ${CMSISDSP}/Include
