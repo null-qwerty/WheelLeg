@@ -4,7 +4,7 @@ void vTaskReadDbus(void *pvParameters)
 {
     dbus.init();
     TickType_t xLastWakeTime;
-    TickType_t xFrequency = pdMS_TO_TICKS(2);
+    TickType_t xFrequency = pdMS_TO_TICKS(1);
     xLastWakeTime = xTaskGetTickCount();
     while (1) {
         // 读取遥控器数据
