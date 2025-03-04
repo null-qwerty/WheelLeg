@@ -83,6 +83,6 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
 )
 
 add_custom_command(OUTPUT flash_target
-    COMMAND openocd -f ${CMAKE_SOURCE_DIR}/flash.cfg -c "program ${CMAKE_PROJECT_NAME}.elf verify reset exit"
+    COMMAND openocd -f ${CMAKE_SOURCE_DIR}/flash.cfg -c "program ${CMAKE_PROJECT_NAME}.elf reset exit"
 )
 add_custom_target(flash DEPENDS flash_target)
