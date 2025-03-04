@@ -108,7 +108,6 @@ int main(void)
     MX_USART2_UART_Init();
     MX_USART3_UART_Init();
     MX_FDCAN1_Init();
-    MX_FDCAN2_Init();
     MX_SPI2_Init();
     MX_TIM12_Init();
     MX_UART5_Init();
@@ -121,6 +120,8 @@ int main(void)
     for (auto &n : note) {
         buzzer.play(n);
     }
+
+    wheelControlMutex = xSemaphoreCreateMutex();
     /* USER CODE END 2 */
 
     /* Init scheduler */

@@ -11,6 +11,21 @@ void vTaskReadDbus(void *pvParameters)
         if (dbus.receiveMessage() == HAL_OK) {
             dbus.decodeDBUSMessage();
         }
+        // 控制轮毂电机速度
+        if (xSemaphoreTake(wheelControlMutex, 1)) {
+            // 前进
+            leftWheel.getTargetState().velocity =
+                (dbus.getDBUSData().rc.ch1 - 1024) / 660.0 * 3600;
+            rightWheel.getTargetState().velocity =
+                leftWheel.getTargetState().velocity;
+            // 转向
+            leftWheel.getTargetState().velocity +=
+                (dbus.getDBUSData().rc.ch0 - 1024) / 660.0 * 800;
+            rightWheel.getTargetState().velocity -=
+                (dbus.getDBUSData().rc.ch0 - 1024) / 660.0 * 800;
+
+            xSemaphoreGive(wheelControlMutex);
+        }
 
         vTaskDelayUntil(&xLastWakeTime, xFrequency);
     }
