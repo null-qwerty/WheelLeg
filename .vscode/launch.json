@@ -21,7 +21,7 @@
             "svdFile": "STM32H723.svd",
             "liveWatch": {
                 "enabled": true,
-                "samplesPerSecond": 5
+                "samplesPerSecond": 20
             },
             "rttConfig": {
                 "enabled": true,
