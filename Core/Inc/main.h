@@ -34,6 +34,7 @@ extern "C" {
 #include "cmsis_os.h"
 #include "dma.h"
 #include "fdcan.h"
+#include "memorymap.h"
 #include "spi.h"
 #include "tim.h"
 #include "usart.h"
@@ -61,6 +62,7 @@ void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
 void SystemClock_Config(void);
+void PeriphCommonClock_Config(void);
 void MX_FREERTOS_Init(void);
 /* USER CODE END EFP */
 
@@ -69,6 +71,10 @@ void MX_FREERTOS_Init(void);
 #define CS1_Accel_GPIO_Port GPIOC
 #define CS1_Gyro_Pin GPIO_PIN_3
 #define CS1_Gyro_GPIO_Port GPIOC
+#define USART3_DE_Pin GPIO_PIN_14
+#define USART3_DE_GPIO_Port GPIOB
+#define USART2_DE_Pin GPIO_PIN_4
+#define USART2_DE_GPIO_Port GPIOD
 
 /* USER CODE BEGIN Private defines */
 
