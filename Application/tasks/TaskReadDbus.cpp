@@ -3,6 +3,9 @@
 void vTaskReadDbus(void *pvParameters)
 {
     dbus.init();
+
+    bool jointInited = false;
+
     TickType_t xLastWakeTime;
     TickType_t xFrequency = pdMS_TO_TICKS(1);
     xLastWakeTime = xTaskGetTickCount();
@@ -25,6 +28,12 @@ void vTaskReadDbus(void *pvParameters)
                 (dbus.getDBUSData().rc.ch0 - 1024) / 660.0 * 800;
 
             xSemaphoreGive(wheelControlMutex);
+        }
+
+        // 初始化关节电机
+        if (!jointInited && dbus.getDBUSData().rc.s2 == 3) {
+            jointInited = true;
+            xTaskNotifyGive(jointInitTaskHandle);
         }
 
         vTaskDelayUntil(&xLastWakeTime, xFrequency);
