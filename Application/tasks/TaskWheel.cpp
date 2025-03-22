@@ -47,7 +47,8 @@ void vTaskWheelControl(void *pvParameters)
         }
 
         // 发送控制信息，若发送失败则重新初始化 CAN 线
-        if (wheelConnectivity.sendMessage() != HAL_OK)
+        auto code = wheelConnectivity.sendMessage();
+        if (code != HAL_OK)
             wheelConnectivity.init();
     }
 
