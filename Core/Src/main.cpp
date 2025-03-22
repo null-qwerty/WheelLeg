@@ -46,13 +46,16 @@
 
 /* USER CODE BEGIN PV */
 uint16_t delayUnit = 150;
+// windows XP startup music
 // Note note[] = { { H3b, 2 * delayUnit }, { M3b, 1 * delayUnit },
 //                 { M7b, 4 * delayUnit }, { M6b, 6 * delayUnit },
 //                 { H3b, 2 * delayUnit }, { M7b, 10 * delayUnit } };
+// default startup music
 Note note[] = { { H1, 1 * delayUnit }, { Z0, 1 * delayUnit },
                 { H1, 1 * delayUnit }, { Z0, 2 * delayUnit },
                 { H1, 1 * delayUnit }, { H2, 1 * delayUnit },
                 { H3, 1 * delayUnit } };
+// a moon filled sky. (from ef - a fairy tale of the two.)
 // Note note[] = { { L6, 1 * delayUnit },  { M4s, 2 * delayUnit },
 //                 { M5, 1 * delayUnit },  { M4s, 2 * delayUnit },
 //                 { M3, 1 * delayUnit },  { M2, 4 * delayUnit },
@@ -60,6 +63,116 @@ Note note[] = { { H1, 1 * delayUnit }, { Z0, 1 * delayUnit },
 //                 { H2, 2 * delayUnit },  { H2, 1 * delayUnit },
 //                 { H3, 1 * delayUnit },  { H2, 1 * delayUnit },
 //                 { H1s, 1 * delayUnit }, { H2, 4 * delayUnit } };
+// you - GALA
+// Note note[] = {
+//     { M5, 4 * delayUnit },   { M3b, 4 * delayUnit },  { M7b, 4 * delayUnit },
+//     { M6b, 4 * delayUnit },  { M5, 4 * delayUnit },   { M3b, 4 * delayUnit },
+//     { M7b, 4 * delayUnit },  { M6b, 4 * delayUnit },  { M5, 4 * delayUnit },
+//     { M3b, 4 * delayUnit },  { M7b, 4 * delayUnit },  { M6b, 4 * delayUnit },
+//     { M5, 4 * delayUnit },   { M3b, 4 * delayUnit },  { M7b, 4 * delayUnit },
+//     { M6b, 2 * delayUnit },  { L7b, 2 * delayUnit },  { M1, 6 * delayUnit },
+//     { L7b, 2 * delayUnit },  { M1, 2 * delayUnit },   { L7b, 2 * delayUnit },
+//     { M1, 2 * delayUnit },   { M3b, 4 * delayUnit },  { M6b, 4 * delayUnit },
+//     { M5, 4 * delayUnit },   { M1, 4 * delayUnit },   { L7b, 2 * delayUnit },
+//     { M1, 6 * delayUnit },   { L7b, 2 * delayUnit },  { M1, 2 * delayUnit },
+//     { L7b, 2 * delayUnit },  { M1, 2 * delayUnit },   { M6b, 8 * delayUnit },
+//     { M5, 2 * delayUnit },   { M7b, 4 * delayUnit },  { M1, 4 * delayUnit },
+//     { M1, 6 * delayUnit },   { L7b, 2 * delayUnit },  { M1, 2 * delayUnit },
+//     { L7b, 2 * delayUnit },  { M1, 2 * delayUnit },   { M5, 4 * delayUnit },
+//     { M6b, 4 * delayUnit },  { M5, 4 * delayUnit },   { M1, 4 * delayUnit },
+//     { L7b, 2 * delayUnit },  { M1, 6 * delayUnit },   { L7b, 2 * delayUnit },
+//     { M1, 2 * delayUnit },   { L7b, 2 * delayUnit },  { M1, 2 * delayUnit },
+//     { M5, 4 * delayUnit },   { M6b, 4 * delayUnit },  { M7b, 10 * delayUnit
+//     }, { Z0, 2 * delayUnit },   { M1, 2 * delayUnit },   { M1, 2 * delayUnit
+//     }, { L7b, 1 * delayUnit },  { M1, 3 * delayUnit },   { L7b, 2 * delayUnit
+//     }, { M1, 2 * delayUnit },   { M3b, 2 * delayUnit },  { Z0, 2 * delayUnit
+//     }, { M1, 2 * delayUnit },   { M1, 2 * delayUnit },   { L7b, 1 * delayUnit
+//     }, { M1, 3 * delayUnit },   { L7b, 2 * delayUnit },  { M1, 2 * delayUnit
+//     }, { M3b, 4 * delayUnit },  { L6b, 6 * delayUnit },  { Z0, 4 * delayUnit
+//     }, { Z0, 4 * delayUnit },   { Z0, 2 * delayUnit },   { M1, 2 * delayUnit
+//     }, { M1, 2 * delayUnit },   { L7b, 1 * delayUnit },  { M1, 1 * delayUnit
+//     }, { L7b, 2 * delayUnit },  { L7b, 1 * delayUnit },  { L6b, 1 * delayUnit
+//     }, { L6b, 2 * delayUnit },  { L7b, 2 * delayUnit },  { Z0, 2 * delayUnit
+//     }, { M1, 2 * delayUnit },   { M1, 2 * delayUnit },   { L7b, 1 * delayUnit
+//     }, { M1, 3 * delayUnit },   { L7b, 2 * delayUnit },  { M1, 2 * delayUnit
+//     }, { M3b, 2 * delayUnit },  { Z0, 2 * delayUnit },   { M1, 2 * delayUnit
+//     }, { M1, 2 * delayUnit },   { L7b, 1 * delayUnit },  { M1, 3 * delayUnit
+//     }, { L7b, 2 * delayUnit },  { M1, 2 * delayUnit },   { M6b, 4 * delayUnit
+//     }, { L6b, 6 * delayUnit },  { Z0, 4 * delayUnit },   { Z0, 4 * delayUnit
+//     }, { Z0, 2 * delayUnit },   { M1, 2 * delayUnit },   { M1, 2 * delayUnit
+//     }, { L7b, 1 * delayUnit },  { M1, 3 * delayUnit },   { L7b, 2 * delayUnit
+//     }, { L5, 2 * delayUnit },   { L4, 1 * delayUnit },   { L3b, 1 * delayUnit
+//     }, { L3b, 4 * delayUnit },  { Z0, 1 * delayUnit },   { L3b, 1 * delayUnit
+//     }, { L3b, 1 * delayUnit },  { L3b, 1 * delayUnit },  { M3b, 4 * delayUnit
+//     }, { M1, 3 * delayUnit },   { L7b, 1 * delayUnit },  { L7b, 1 * delayUnit
+//     }, { L6b, 1 * delayUnit },  { L6b, 4 * delayUnit },  { L6b, 2 * delayUnit
+//     }, { L6b, 2 * delayUnit },  { L7b, 2 * delayUnit },  { M1, 2 * delayUnit
+//     }, { L4, 6 * delayUnit },   { Z0, 2 * delayUnit },   { L4, 2 * delayUnit
+//     }, { M1, 2 * delayUnit },   { L7b, 2 * delayUnit },  { L6b, 2 * delayUnit
+//     }, { L7b, 10 * delayUnit }, { M1, 4 * delayUnit },   { M2b, 4 * delayUnit
+//     }, { M3b, 6 * delayUnit },  { M1, 2 * delayUnit },   { M3b, 2 * delayUnit
+//     }, { M1, 1 * delayUnit },   { M3b, 3 * delayUnit },  { M5, 4 * delayUnit
+//     }, { M6b, 6 * delayUnit },  { L6b, 2 * delayUnit },  { L7b, 2 * delayUnit
+//     }, { M1, 2 * delayUnit },   { M3b, 4 * delayUnit },  { M4, 4 * delayUnit
+//     }, { M3b, 1 * delayUnit },  { M4, 3 * delayUnit },   { M3b, 1 * delayUnit
+//     }, { M3b, 3 * delayUnit },  { M3b, 2 * delayUnit },  { L7b, 2 * delayUnit
+//     }, { L7b, 6 * delayUnit },  { M1, 4 * delayUnit },   { M2b, 4 * delayUnit
+//     }, { M3b, 6 * delayUnit },  { M1, 2 * delayUnit },   { M3b, 2 * delayUnit
+//     }, { M1, 1 * delayUnit },   { M3b, 3 * delayUnit },  { M5, 4 * delayUnit
+//     }, { M6b, 6 * delayUnit },  { L6b, 2 * delayUnit },  { L7b, 2 * delayUnit
+//     }, { M1, 2 * delayUnit },   { M5, 4 * delayUnit },   { M4, 6 * delayUnit
+//     }, { M4, 2 * delayUnit },   { M3b, 1 * delayUnit },  { M4, 3 * delayUnit
+//     }, { M6b, 4 * delayUnit },  { M7b, 6 * delayUnit },  { Z0, 2 * delayUnit
+//     }, { M3b, 2 * delayUnit },  { M6b, 2 * delayUnit },  { M5, 1 * delayUnit
+//     }, { M6b, 1 * delayUnit },  { M1, 6 * delayUnit },   { L7b, 2 * delayUnit
+//     }, { M1, 2 * delayUnit },   { L7b, 2 * delayUnit },  { M1, 2 * delayUnit
+//     }, { M5, 4 * delayUnit },   { M6b, 4 * delayUnit },  { M5, 4 * delayUnit
+//     }, { M1, 4 * delayUnit },   { L7b, 2 * delayUnit },  { M1, 6 * delayUnit
+//     }, { L7b, 2 * delayUnit },  { M1, 2 * delayUnit },   { L7b, 2 * delayUnit
+//     }, { M1, 2 * delayUnit },   { M5, 4 * delayUnit },   { M6b, 4 * delayUnit
+//     }, { M7b, 10 * delayUnit }, { Z0, 2 * delayUnit },   { M1, 2 * delayUnit
+//     }, { M1, 2 * delayUnit },   { L7b, 1 * delayUnit },  { M1, 3 * delayUnit
+//     }, { L7b, 2 * delayUnit },  { M1, 2 * delayUnit },   { M3b, 2 * delayUnit
+//     }, { Z0, 2 * delayUnit },   { M1, 2 * delayUnit },   { M1, 2 * delayUnit
+//     }, { L7b, 1 * delayUnit },  { M1, 3 * delayUnit },   { L7b, 2 * delayUnit
+//     }, { M1, 2 * delayUnit },   { M3b, 4 * delayUnit },  { L6b, 6 * delayUnit
+//     }, { Z0, 4 * delayUnit },   { Z0, 4 * delayUnit },   { Z0, 2 * delayUnit
+//     }, { M1, 2 * delayUnit },   { M1, 2 * delayUnit },   { L7b, 1 * delayUnit
+//     }, { M1, 1 * delayUnit },   { L7b, 2 * delayUnit },  { L7b, 1 * delayUnit
+//     }, { L6b, 1 * delayUnit },  { L6b, 2 * delayUnit },  { L7b, 2 * delayUnit
+//     }, { Z0, 2 * delayUnit },   { M1, 2 * delayUnit },   { M1, 2 * delayUnit
+//     }, { L7b, 1 * delayUnit },  { M1, 3 * delayUnit },   { L7b, 2 * delayUnit
+//     }, { M1, 2 * delayUnit },   { M3b, 2 * delayUnit },  { Z0, 2 * delayUnit
+//     }, { M1, 2 * delayUnit },   { M1, 2 * delayUnit },   { L7b, 1 * delayUnit
+//     }, { M1, 3 * delayUnit },   { L7b, 2 * delayUnit },  { M1, 2 * delayUnit
+//     }, { M6b, 4 * delayUnit },  { L6b, 6 * delayUnit },  { Z0, 4 * delayUnit
+//     }, { Z0, 4 * delayUnit },   { Z0, 2 * delayUnit },   { M1, 2 * delayUnit
+//     }, { M1, 2 * delayUnit },   { L7b, 1 * delayUnit },  { M1, 3 * delayUnit
+//     }, { L7b, 2 * delayUnit },  { L5, 2 * delayUnit },   { L4, 1 * delayUnit
+//     }, { L3b, 1 * delayUnit },  { L3b, 4 * delayUnit },  { Z0, 1 * delayUnit
+//     }, { L3b, 1 * delayUnit },  { L3b, 1 * delayUnit },  { L3b, 1 * delayUnit
+//     }, { M3b, 4 * delayUnit },  { M1, 3 * delayUnit },   { L7b, 1 * delayUnit
+//     }, { L7b, 1 * delayUnit },  { L6b, 1 * delayUnit },  { L6b, 4 * delayUnit
+//     }, { L6b, 2 * delayUnit },  { L6b, 2 * delayUnit },  { L7b, 2 * delayUnit
+//     }, { M1, 2 * delayUnit },   { L4, 6 * delayUnit },   { Z0, 2 * delayUnit
+//     }, { L4, 2 * delayUnit },   { M1, 2 * delayUnit },   { L7b, 2 * delayUnit
+//     }, { L6b, 2 * delayUnit },  { L7b, 26 * delayUnit }, { M1, 4 * delayUnit
+//     }, { M2b, 4 * delayUnit },  { M3b, 6 * delayUnit },  { M1, 2 * delayUnit
+//     }, { M3b, 2 * delayUnit },  { M1, 1 * delayUnit },   { M3b, 3 * delayUnit
+//     }, { M5, 4 * delayUnit },   { M6b, 6 * delayUnit },  { L6b, 2 * delayUnit
+//     }, { L7b, 2 * delayUnit },  { M1, 2 * delayUnit },   { M3b, 4 * delayUnit
+//     }, { M4, 5 * delayUnit },   { M3b, 1 * delayUnit },  { M4, 2 * delayUnit
+//     }, { M3b, 1 * delayUnit },  { M3b, 3 * delayUnit },  { M3b, 2 * delayUnit
+//     }, { L7b, 2 * delayUnit },  { L7b, 6 * delayUnit },  { M1, 4 * delayUnit
+//     }, { M2b, 4 * delayUnit },  { M3b, 8 * delayUnit },  { M3b, 2 * delayUnit
+//     }, { M1, 1 * delayUnit },   { M3b, 3 * delayUnit },  { M7b, 4 * delayUnit
+//     }, { M6b, 6 * delayUnit },  { L6b, 2 * delayUnit },  { L7b, 2 * delayUnit
+//     }, { M1, 2 * delayUnit },   { M6b, 4 * delayUnit },  { M4, 5 * delayUnit
+//     }, { M3b, 1 * delayUnit },  { M4, 2 * delayUnit },   { M3b, 1 * delayUnit
+//     }, { M4, 3 * delayUnit },   { M6b, 4 * delayUnit },  { M7b, 6 * delayUnit
+//     }, { Z0, 2 * delayUnit },   { L7b, 2 * delayUnit },  { M1, 2 * delayUnit
+//     }, { L7b, 1 * delayUnit },  { L6b, 17 * delayUnit },
+// };
 Buzzer buzzer(&htim12, TIM_CHANNEL_2, 275 * 1e6, 100);
 /* USER CODE END PV */
 
@@ -98,6 +211,9 @@ int main(void)
     /* Configure the system clock */
     SystemClock_Config();
 
+    /* Configure the peripherals common clocks */
+    PeriphCommonClock_Config();
+
     /* USER CODE BEGIN SysInit */
 
     /* USER CODE END SysInit */
@@ -113,6 +229,7 @@ int main(void)
     MX_UART5_Init();
     MX_TIM3_Init();
     MX_TIM7_Init();
+    MX_SPI6_Init();
     /* USER CODE BEGIN 2 */
     HAL_TIM_Base_Start(&htim12);
     HAL_TIM_PWM_Start(&htim12, TIM_CHANNEL_2);
@@ -199,6 +316,44 @@ void SystemClock_Config(void)
     RCC_ClkInitStruct.APB4CLKDivider = RCC_APB4_DIV2;
 
     if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_3) != HAL_OK) {
+        Error_Handler();
+    }
+}
+
+/**
+ * @brief Peripherals Common Clock Configuration
+ * @retval None
+ */
+void PeriphCommonClock_Config(void)
+{
+    RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = { 0 };
+
+    /** Initializes the peripherals clock
+     */
+    PeriphClkInitStruct.PeriphClockSelection =
+        RCC_PERIPHCLK_SPI6 | RCC_PERIPHCLK_UART5 | RCC_PERIPHCLK_FDCAN |
+        RCC_PERIPHCLK_USART2 | RCC_PERIPHCLK_USART3;
+    PeriphClkInitStruct.PLL2.PLL2M = 4;
+    PeriphClkInitStruct.PLL2.PLL2N = 50;
+    PeriphClkInitStruct.PLL2.PLL2P = 1;
+    PeriphClkInitStruct.PLL2.PLL2Q = 25;
+    PeriphClkInitStruct.PLL2.PLL2R = 2;
+    PeriphClkInitStruct.PLL2.PLL2RGE = RCC_PLL2VCIRANGE_2;
+    PeriphClkInitStruct.PLL2.PLL2VCOSEL = RCC_PLL2VCOWIDE;
+    PeriphClkInitStruct.PLL2.PLL2FRACN = 0;
+    PeriphClkInitStruct.PLL3.PLL3M = 24;
+    PeriphClkInitStruct.PLL3.PLL3N = 384;
+    PeriphClkInitStruct.PLL3.PLL3P = 1;
+    PeriphClkInitStruct.PLL3.PLL3Q = 5;
+    PeriphClkInitStruct.PLL3.PLL3R = 2;
+    PeriphClkInitStruct.PLL3.PLL3RGE = RCC_PLL3VCIRANGE_0;
+    PeriphClkInitStruct.PLL3.PLL3VCOSEL = RCC_PLL3VCOMEDIUM;
+    PeriphClkInitStruct.PLL3.PLL3FRACN = 0;
+    PeriphClkInitStruct.FdcanClockSelection = RCC_FDCANCLKSOURCE_PLL2;
+    PeriphClkInitStruct.Usart234578ClockSelection =
+        RCC_USART234578CLKSOURCE_PLL3;
+    PeriphClkInitStruct.Spi6ClockSelection = RCC_SPI6CLKSOURCE_PLL2;
+    if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK) {
         Error_Handler();
     }
 }
