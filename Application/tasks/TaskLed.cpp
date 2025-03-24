@@ -46,7 +46,7 @@ void vTaskLed(void *pvParameters)
     ledConnectivity.init();
 
     TickType_t xLastWakeTime;
-    TickType_t xFrequency = pdMS_TO_TICKS(10);
+    TickType_t xFrequency = pdMS_TO_TICKS(5);
 
     uint8_t red = 0xff, green = 0x00, blue = 0x00;
 
