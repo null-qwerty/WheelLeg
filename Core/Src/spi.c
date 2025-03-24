@@ -82,7 +82,7 @@ void MX_SPI6_Init(void)
   /* USER CODE END SPI6_Init 1 */
   hspi6.Instance = SPI6;
   hspi6.Init.Mode = SPI_MODE_MASTER;
-  hspi6.Init.Direction = SPI_DIRECTION_2LINES;
+  hspi6.Init.Direction = SPI_DIRECTION_2LINES_TXONLY;
   hspi6.Init.DataSize = SPI_DATASIZE_8BIT;
   hspi6.Init.CLKPolarity = SPI_POLARITY_LOW;
   hspi6.Init.CLKPhase = SPI_PHASE_1EDGE;
