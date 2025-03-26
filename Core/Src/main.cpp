@@ -228,8 +228,8 @@ int main(void)
     MX_TIM12_Init();
     MX_UART5_Init();
     MX_TIM3_Init();
-    MX_TIM7_Init();
     MX_SPI6_Init();
+    MX_TIM7_Init();
     /* USER CODE BEGIN 2 */
     HAL_TIM_Base_Start(&htim12);
     HAL_TIM_PWM_Start(&htim12, TIM_CHANNEL_2);
@@ -331,16 +331,7 @@ void PeriphCommonClock_Config(void)
     /** Initializes the peripherals clock
      */
     PeriphClkInitStruct.PeriphClockSelection =
-        RCC_PERIPHCLK_SPI6 | RCC_PERIPHCLK_UART5 | RCC_PERIPHCLK_FDCAN |
-        RCC_PERIPHCLK_USART2 | RCC_PERIPHCLK_USART3;
-    PeriphClkInitStruct.PLL2.PLL2M = 4;
-    PeriphClkInitStruct.PLL2.PLL2N = 50;
-    PeriphClkInitStruct.PLL2.PLL2P = 1;
-    PeriphClkInitStruct.PLL2.PLL2Q = 25;
-    PeriphClkInitStruct.PLL2.PLL2R = 2;
-    PeriphClkInitStruct.PLL2.PLL2RGE = RCC_PLL2VCIRANGE_2;
-    PeriphClkInitStruct.PLL2.PLL2VCOSEL = RCC_PLL2VCOWIDE;
-    PeriphClkInitStruct.PLL2.PLL2FRACN = 0;
+        RCC_PERIPHCLK_UART5 | RCC_PERIPHCLK_USART2 | RCC_PERIPHCLK_USART3;
     PeriphClkInitStruct.PLL3.PLL3M = 24;
     PeriphClkInitStruct.PLL3.PLL3N = 384;
     PeriphClkInitStruct.PLL3.PLL3P = 1;
@@ -349,10 +340,8 @@ void PeriphCommonClock_Config(void)
     PeriphClkInitStruct.PLL3.PLL3RGE = RCC_PLL3VCIRANGE_0;
     PeriphClkInitStruct.PLL3.PLL3VCOSEL = RCC_PLL3VCOMEDIUM;
     PeriphClkInitStruct.PLL3.PLL3FRACN = 0;
-    PeriphClkInitStruct.FdcanClockSelection = RCC_FDCANCLKSOURCE_PLL2;
     PeriphClkInitStruct.Usart234578ClockSelection =
         RCC_USART234578CLKSOURCE_PLL3;
-    PeriphClkInitStruct.Spi6ClockSelection = RCC_SPI6CLKSOURCE_PLL2;
     if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK) {
         Error_Handler();
     }
