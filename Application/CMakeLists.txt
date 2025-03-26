@@ -1,10 +1,7 @@
 set(APPLICATION_INCLUDE_DIRS 
-    include
-    /usr/arm-linux-gnueabi/include
-    ${CMAKE_SOURCE_DIR}/PHOENIX/include
-    ${CMSISDSP}/Include
-    ${CMSISDSP}/PrivateInclude
-    ${CMSISDSP}/Include/dsp
+    ${CMAKE_CURRENT_LIST_DIR}/include
+    ${PHOENIX_INCLUDE_DIRS}
+    CACHE INTERNAL "APPLICATION include directories"
 )
 include_directories(
     ${APPLICATION_INCLUDE_DIRS}
