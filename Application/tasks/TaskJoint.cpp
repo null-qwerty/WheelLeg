@@ -1,9 +1,5 @@
 #include "BaseControl/Motor/UnitreeA1protocol.hpp"
 
-#include "stm32h7xx.h"
-#include "stm32h7xx_hal_def.h"
-#include "stm32h7xx_hal_dma.h"
-#include "stm32h7xx_hal_uart.h"
 #include "tasks.hpp"
 #include "usart.h"
 
