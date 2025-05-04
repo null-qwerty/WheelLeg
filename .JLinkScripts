@@ -1,0 +1,5 @@
+speed 4000
+device STM32H723VG
+r
+loadfile ./WheelLeg.elf
+q

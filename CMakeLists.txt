@@ -76,7 +76,11 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
     application
 )
 
-add_custom_command(OUTPUT flash_target
+add_custom_command(OUTPUT openocd
     COMMAND openocd -f ${CMAKE_SOURCE_DIR}/flash.cfg -c "program ${CMAKE_PROJECT_NAME}.elf reset exit"
 )
-add_custom_target(flash DEPENDS flash_target)
+add_custom_command(OUTPUT jlink
+    COMMAND JLinkExe -if SWD -CommanderScript ${CMAKE_SOURCE_DIR}/.JLinkScripts)
+
+add_custom_target(flash_openocd DEPENDS openocd)
+add_custom_target(flash_jlink DEPENDS jlink)
