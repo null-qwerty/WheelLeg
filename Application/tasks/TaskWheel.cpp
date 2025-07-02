@@ -26,8 +26,8 @@ void vTaskWheelReceive(void *pvParameters)
     vTaskDelete(wheelReceiveTaskHandle);
 }
 
-pidController lwslc(20., 0.05, 0.7, 14000, -14000);
-pidController rwslc(20., 0.05, 0.7, 14000, -14000);
+pidController lwslc(6000., 0., 1., 200000, -200000);
+pidController rwslc(6000., 0., 1., 200000, -200000);
 
 void vTaskWheelControl(void *pvParameters)
 {
@@ -95,5 +95,7 @@ FDCAN wheelConnectivity = FDCAN(&hfdcan1, wheelFdcanFilter, 0);
 
 // pid 调参, 使用的 TI 的开源 pid，计算方式见 pidController::Calculate()
 // 算法的微分部分似乎会造成高频震荡且微分输出值存在爆炸的风险，需查阅资料（解决，参考pidController::Calculate()）
-RM3508 leftWheel = RM3508(wheelConnectivity, 4, 0x204, LEFT_MOTOR_CLOCKWISE);
-RM3508 rightWheel = RM3508(wheelConnectivity, 1, 0x201, RIGHT_MOTOR_CLOCKWISE);
+RM3508 leftWheel =
+    RM3508(wheelConnectivity, 4, 0x204, LEFT_MOTOR_CLOCKWISE, 268.0f / 17.0f);
+RM3508 rightWheel =
+    RM3508(wheelConnectivity, 1, 0x201, RIGHT_MOTOR_CLOCKWISE, 268.0f / 17.0f);

@@ -18,14 +18,14 @@ void vTaskReadDbus(void *pvParameters)
         if (xSemaphoreTake(wheelControlMutex, 1)) {
             // 前进
             leftWheel.getTargetState().velocity =
-                (dbus.getDBUSData().rc.ch1 - 1024) / 660.0 * 3600;
+                (dbus.getDBUSData().rc.ch1 - 1024) / 660.0 * 360;
             rightWheel.getTargetState().velocity =
                 leftWheel.getTargetState().velocity;
             // 转向
             leftWheel.getTargetState().velocity +=
-                (dbus.getDBUSData().rc.ch0 - 1024) / 660.0 * 800;
+                (dbus.getDBUSData().rc.ch0 - 1024) / 660.0 * 80;
             rightWheel.getTargetState().velocity -=
-                (dbus.getDBUSData().rc.ch0 - 1024) / 660.0 * 800;
+                (dbus.getDBUSData().rc.ch0 - 1024) / 660.0 * 80;
 
             xSemaphoreGive(wheelControlMutex);
         }
