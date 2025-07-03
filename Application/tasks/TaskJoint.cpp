@@ -162,7 +162,7 @@ uint8_t jointOption = Motor::MotorOption::MOTOR_SOFT_LIMIT |
                       Motor::MotorOption::MOTOR_SOFT_ZERO;
 Motor::MotorOptionData jointOptionData = {
     .soft_limit_min = DEGREE_TO_RAND(-15.0f),
-    .soft_limit_max = DEGREE_TO_RAND(48.0f),
+    .soft_limit_max = DEGREE_TO_RAND(45.0f),
     .soft_zero = 0.0f,
 };
 
