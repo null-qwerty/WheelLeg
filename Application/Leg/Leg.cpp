@@ -3,19 +3,29 @@
 #include "Math/Matrix.hpp"
 #include "Math/Trigonometric.hpp"
 #include "Math/Vector.hpp"
+#include "Utils/Status.hpp"
 
-Leg::Leg(Joint &frontJoint, Joint &backJoint, Wheel &wheel)
+Leg::Leg(Joint &frontJoint, Joint &backJoint, Wheel &wheel, float dt)
     : frontJoint(frontJoint)
     , backJoint(backJoint)
     , wheel(wheel)
+    , dt(dt)
 {
 }
 
 Leg &Leg::init()
 {
-    // TODO 初始化腿部关节电机
-    //  1. 撞击限位，设置软零点
-    //  2. 将关节电机设置到水平位置
+    current_state.status = STATUS_INITUALIZING;
+
+    auto max = frontJoint.getOptionData().soft_limit_max;
+    auto min = frontJoint.getOptionData().soft_limit_min;
+
+    leg_length_max = calculateState(max, max).l;
+    leg_length_min = calculateState(min, min).l;
+
+    target_state.l = (leg_length_max + leg_length_min) / 2.0f;
+
+    current_state.status = STATUS_INITUALIZED;
 
     return *this;
 }
@@ -43,11 +53,27 @@ Leg &Leg::setLinearzationParam(Matrix<12, 6> p)
     return *this;
 }
 
-Leg &Leg::setJointLimit(float maxAngle, float minAngle)
+Leg &Leg::setLegLenthController(pidController controller)
 {
-    angleLimitMax = maxAngle;
-    angleLimitMin = minAngle;
+    leg_length_controller = controller;
+    return *this;
+}
 
+Leg &Leg::setRollCompensation(float f)
+{
+    F_roll_compensation = f;
+    return *this;
+}
+
+Leg &Leg::setYawCompensation(float t)
+{
+    T_yaw = t;
+    return *this;
+}
+
+Leg &Leg::setThetaCompensation(float t)
+{
+    T_p_theta = t;
     return *this;
 }
 
@@ -63,47 +89,67 @@ Leg::State &Leg::getTargetState()
 
 Leg &Leg::calculateTotalTorque()
 {
+    // 计算当前状态
+    auto estimated_state = calculateState(frontJoint.getState().position,
+                                          backJoint.getState().position);
+    current_state.theta_dot =
+        (estimated_state.theta - current_state.theta) / dt; // 摆杆角速度
+    current_state.theta = estimated_state.theta;
+    current_state.l = estimated_state.l;
+
     X = Vector6f((float *)(&target_state)) -
         Vector6f((float *)(&current_state)); // 计算当前状态与目标状态的差值向量
     u_balance = calculateK() * X; // 计算为了保持平衡状态的虚拟力矩
-    // u_balance[0]: 动力轮力矩
-    // u_balance[1]: 摆杆力矩
+    F_leg_length = leg_length_controller.calculate(
+        target_state.l, current_state.l); // 计算腿长控制力矩
 
-    // TODO: 添加控制腿长的力矩计算；留接口用于外部传入防止劈叉的控制力矩
-    // 合成力矩
-    u[0] = 0; // 径向力矩
-    u[1] = u_balance[1]; // 切向力矩
-    transformToJointTorque(u); // 将合成力矩转换为关节力矩
+    u[0] = u_balance[0] + T_yaw;
+    u[1] = u_balance[1] + T_p_theta;
 
-    frontJoint.getTargetState().toreque = u[0]; // 设置前关节的目标力矩
-    backJoint.getTargetState().toreque = u[1];
+    F[0] = F_leg_length + F_roll_compensation;
+    F[1] = u[1];
+
+    T = transformToJointTorque(F); // 将合成力矩转换为关节力矩
+
+    wheel.getTargetState().toreque = u[0]; // 设置轮子的目标力矩
+    frontJoint.getTargetState().toreque = T[0]; // 设置前关节的目标力矩
+    backJoint.getTargetState().toreque = T[1]; // 设置后关节的目标力矩
 
     return *this;
 }
 
-Leg &Leg::transformToJointTorque(Vector2f &u)
+Vector2f Leg::transformToJointTorque(Vector2f &u)
 {
-    calculateCurrentState();
-
     auto &phi0 = current_state.phi;
     auto &l0 = current_state.l;
 
     Matrix2x2f T;
+    Vector2f F;
     // clang-format off
     T << l1 * Math::sin(phi1 - phi3) * Math::sin(phi0 - phi2) / Math::sin(phi3 - phi2),
          l1 * Math::cos(phi1 - phi3) * Math::sin(phi0 - phi2) / (l0 * Math::sin(phi3 - phi2)),
          l4 * Math::sin(phi0 - phi2) * Math::sin(phi3 - phi4) / Math::sin(phi3 - phi2),
          l4 * Math::cos(phi0 - phi2) * Math::sin(phi3 - phi4) / (l0 * Math::sin(phi3 - phi2));
     // clang-format on
-    u = T * u;
+    F = T * u;
 
-    return *this;
+    return F;
 }
 
-Leg &Leg::calculateCurrentState()
+Leg::State Leg::calculateState(float angle_front, float angle_back)
 {
-    phi1 = PI - frontJoint.getState().position;
-    phi4 = backJoint.getState().position;
+    State estimated_state = {
+        .theta = 0.0f, // 摆杆角度
+        .theta_dot = 0.0f, // 摆杆角速度，暂时设为 0
+        .x = 0.0f, // 位移，暂时设为 0
+        .x_dot = 0.0f, // 位移速度，暂时设为 0
+        .phi = 0.0f, // 机体角度
+        .phi_dot = 0.0f, // 机体角速度，暂时设为 0
+        .l = 0.0f, // 腿长
+        .status = Status::STATUS_SUCCESS // 状态设为运行中
+    };
+    phi1 = PI - angle_front;
+    phi4 = angle_back;
 
     B[0] = A[0] + l1 * Math::cos(phi1);
     B[1] = A[1] + l1 * Math::sin(phi1);
@@ -122,10 +168,10 @@ Leg &Leg::calculateCurrentState()
     C[0] = B[0] + l2 * Math::cos(phi2);
     C[1] = B[1] + l2 * Math::sin(phi2);
 
-    current_state.phi = Math::atan2(C[1], C[0]);
+    estimated_state.theta = Math::atan2(C[1], C[0]);
     current_state.l = C.magnitude();
 
-    return *this;
+    return estimated_state;
 }
 
 Matrix<2, 6> &Leg::calculateK()
