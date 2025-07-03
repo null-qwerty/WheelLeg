@@ -1,62 +1,70 @@
+#include "BaseControl/Connectivity/Connectivity.hpp"
+#include "BaseControl/Motor/Motor.hpp"
 #include "BaseControl/Motor/UnitreeA1protocol.hpp"
 
+#include "Math/Trigonometric.hpp"
+#include "cmsis_os2.h"
+#include "projdefs.h"
 #include "tasks.hpp"
 #include "usart.h"
 
 void vTaskJointInit(void *pvParameters)
 {
     // 使用 FreeRTOS 函数来动态分配内存
-    auto r_sendframe = (UART::xUARTFrame_t *)(rLegConnectivity.getSendFrame());
-    r_sendframe->length = sizeof(sendData);
-    r_sendframe->data[0] = (uint8_t *)pvPortMalloc(r_sendframe->length);
-    r_sendframe->data[1] = (uint8_t *)pvPortMalloc(r_sendframe->length);
-    auto r_receiveframe =
-        (UART::xUARTFrame_t *)(rLegConnectivity.getReceiveFrame());
-    r_receiveframe->length = sizeof(receiveData);
-    r_receiveframe->data[0] = (uint8_t *)pvPortMalloc(r_receiveframe->length);
-    r_receiveframe->data[1] = (uint8_t *)pvPortMalloc(r_receiveframe->length);
 
-    auto l_sendframe = (UART::xUARTFrame_t *)(lLegConnectivity.getSendFrame());
-    l_sendframe->length = sizeof(sendData);
-    l_sendframe->data[0] = (uint8_t *)pvPortMalloc(l_sendframe->length);
-    l_sendframe->data[1] = (uint8_t *)pvPortMalloc(l_sendframe->length);
-    auto l_receiveframe =
-        (UART::xUARTFrame_t *)(lLegConnectivity.getReceiveFrame());
-    l_receiveframe->length = sizeof(receiveData);
-    l_receiveframe->data[0] = (uint8_t *)pvPortMalloc(l_receiveframe->length);
-    l_receiveframe->data[1] = (uint8_t *)pvPortMalloc(l_receiveframe->length);
-    // 初始化，启动接收
-    lLegConnectivity.receiveMessage();
-    rLegConnectivity.receiveMessage();
+    auto initfunction = [&](Connectivity &connectivity) {
+        auto sendframe = (UART::xUARTFrame_t *)(connectivity.getSendFrame());
+        auto receiveframe =
+            (UART::xUARTFrame_t *)(connectivity.getReceiveFrame());
+        sendframe->length = sizeof(sendData);
+        receiveframe->length = sizeof(receiveData);
+
+        sendframe->data[0] = (uint8_t *)pvPortMalloc(sendframe->length);
+        sendframe->data[1] = (uint8_t *)pvPortMalloc(sendframe->length);
+        receiveframe->data[0] = (uint8_t *)pvPortMalloc(receiveframe->length);
+        receiveframe->data[1] = (uint8_t *)pvPortMalloc(receiveframe->length);
+
+        memset(sendframe->data[0], 0, sendframe->length);
+        memset(sendframe->data[1], 0, sendframe->length);
+        memset(receiveframe->data[0], 0, receiveframe->length);
+        memset(receiveframe->data[1], 0, receiveframe->length);
+
+        connectivity.receiveMessage();
+    };
+
+    initfunction(lLegConnectivity);
+    initfunction(rLegConnectivity);
 
     while (true) {
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
         lfJoint.init();
-        lLegConnectivity.sendMessage();
+        // lLegConnectivity.sendMessage();
         osDelay(5);
         lbJoint.init();
-        lLegConnectivity.sendMessage();
-
+        // lLegConnectivity.sendMessage();
+        osDelay(5);
         rfJoint.init();
-        rLegConnectivity.sendMessage();
+        // rLegConnectivity.sendMessage();
         osDelay(5);
         rbJoint.init();
-        rLegConnectivity.sendMessage();
-
+        // rLegConnectivity.sendMessage();
         osDelay(5);
 
         xTaskNotifyGive(lJointTransmitTaskHandle);
         xTaskNotifyGive(rJointTransmitTaskHandle);
     }
     // 释放内存
-    vPortFree(r_sendframe->data[0]);
-    vPortFree(r_sendframe->data[1]);
-    vPortFree(r_receiveframe->data[0]);
-    vPortFree(r_receiveframe->data[1]);
-    vPortFree(l_sendframe->data[0]);
-    vPortFree(l_sendframe->data[1]);
-    vPortFree(l_receiveframe->data[0]);
-    vPortFree(l_receiveframe->data[1]);
+    auto deinitfunction = [&](Connectivity &connectivity) {
+        auto sendframe = (UART::xUARTFrame_t *)(connectivity.getSendFrame());
+        auto receiveframe =
+            (UART::xUARTFrame_t *)(connectivity.getReceiveFrame());
+        vPortFree(sendframe->data[0]);
+        vPortFree(sendframe->data[1]);
+        vPortFree(receiveframe->data[0]);
+        vPortFree(receiveframe->data[1]);
+    };
+    deinitfunction(lLegConnectivity);
+    deinitfunction(rLegConnectivity);
     vTaskDelete(jointInitTaskHandle);
 }
 
@@ -65,17 +73,17 @@ void vTaskLeftJointTransmit(void *pvParameters)
     ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
 
     TickType_t xLastWakeTime = xTaskGetTickCount();
-    TickType_t xFrequency = pdMS_TO_TICKS(2);
+    TickType_t xFrequency = pdMS_TO_TICKS(4);
 
     while (true) {
         lfJoint.encodeControlMessage();
         lLegConnectivity.sendMessage();
         // 由于 A1 电机是一问一答的，所以这里需要等待反馈数据
-        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+        ulTaskNotifyTake(pdTRUE, 1);
 
         lbJoint.encodeControlMessage();
         lLegConnectivity.sendMessage();
-        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+        ulTaskNotifyTake(pdTRUE, 1);
         // 任务定频执行
         //! 不一定能够定频，因为与中断有关。这里应该给一个宽松的时间，保证长于上面等待信号量的时间。
         //* 4.8M 波特率，一次发送 34 字节，接收 78 字节，1 停止位无校验位：
@@ -92,16 +100,16 @@ void vTaskRightJointTransmit(void *pvParameters)
     ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
 
     TickType_t xLastWakeTime = xTaskGetTickCount();
-    TickType_t xFrequency = pdMS_TO_TICKS(2);
+    TickType_t xFrequency = pdMS_TO_TICKS(4);
 
     while (true) {
         rfJoint.encodeControlMessage();
         rLegConnectivity.sendMessage();
-        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+        ulTaskNotifyTake(pdTRUE, 1);
 
         rbJoint.encodeControlMessage();
         rLegConnectivity.sendMessage();
-        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+        ulTaskNotifyTake(pdTRUE, 1);
 
         vTaskDelayUntil(&xLastWakeTime, xFrequency);
     }
@@ -150,11 +158,23 @@ xTaskHandle rJointTransmitTaskHandle;
 UART lLegConnectivity(&huart2, UART::dmaOption::RX);
 UART rLegConnectivity(&huart3, UART::dmaOption::RX);
 
+uint8_t jointOption = Motor::MotorOption::MOTOR_SOFT_LIMIT |
+                      Motor::MotorOption::MOTOR_SOFT_ZERO;
+Motor::MotorOptionData jointOptionData = {
+    .soft_limit_min = DEGREE_TO_RAND(-15.0f),
+    .soft_limit_max = DEGREE_TO_RAND(48.0f),
+    .soft_zero = 0.0f,
+};
+
 UnitreeA1 lfJoint(lLegConnectivity, 0, 0,
-                  LEFT_MOTOR_CLOCKWISE *FRONT_MOTOR_CLOCKWISE);
+                  LEFT_MOTOR_CLOCKWISE *FRONT_MOTOR_CLOCKWISE, 9.1f,
+                  jointOption, jointOptionData);
 UnitreeA1 lbJoint(lLegConnectivity, 1, 1,
-                  LEFT_MOTOR_CLOCKWISE *BACK_MOTOR_CLOCKWISE);
+                  LEFT_MOTOR_CLOCKWISE *BACK_MOTOR_CLOCKWISE, 9.1f, jointOption,
+                  jointOptionData);
 UnitreeA1 rfJoint(rLegConnectivity, 0, 0,
-                  RIGHT_MOTOR_CLOCKWISE *FRONT_MOTOR_CLOCKWISE);
+                  RIGHT_MOTOR_CLOCKWISE *FRONT_MOTOR_CLOCKWISE, 9.1f,
+                  jointOption, jointOptionData);
 UnitreeA1 rbJoint(rLegConnectivity, 1, 1,
-                  RIGHT_MOTOR_CLOCKWISE *BACK_MOTOR_CLOCKWISE);
+                  RIGHT_MOTOR_CLOCKWISE *BACK_MOTOR_CLOCKWISE, 9.1f,
+                  jointOption, jointOptionData);
