@@ -239,9 +239,9 @@ int main(void)
     HAL_TIM_Base_Start(&htim12);
     HAL_TIM_PWM_Start(&htim12, TIM_CHANNEL_2);
 
-    for (auto &n : note) {
-        buzzer.play(n);
-    }
+    // for (auto &n : note) {
+    //     buzzer.play(n);
+    // }
     MX_USB_DEVICE_Init();
 
     wheelControlMutex = xSemaphoreCreateMutex();
@@ -339,15 +339,17 @@ void PeriphCommonClock_Config(void)
     /** Initializes the peripherals clock
      */
     PeriphClkInitStruct.PeriphClockSelection =
-        RCC_PERIPHCLK_UART5 | RCC_PERIPHCLK_USART2 | RCC_PERIPHCLK_USART3;
+        RCC_PERIPHCLK_SPI2 | RCC_PERIPHCLK_UART5 | RCC_PERIPHCLK_USART2 |
+        RCC_PERIPHCLK_USART3;
     PeriphClkInitStruct.PLL3.PLL3M = 24;
     PeriphClkInitStruct.PLL3.PLL3N = 384;
-    PeriphClkInitStruct.PLL3.PLL3P = 1;
+    PeriphClkInitStruct.PLL3.PLL3P = 3;
     PeriphClkInitStruct.PLL3.PLL3Q = 5;
     PeriphClkInitStruct.PLL3.PLL3R = 2;
     PeriphClkInitStruct.PLL3.PLL3RGE = RCC_PLL3VCIRANGE_0;
     PeriphClkInitStruct.PLL3.PLL3VCOSEL = RCC_PLL3VCOMEDIUM;
     PeriphClkInitStruct.PLL3.PLL3FRACN = 0;
+    PeriphClkInitStruct.Spi123ClockSelection = RCC_SPI123CLKSOURCE_PLL3;
     PeriphClkInitStruct.Usart234578ClockSelection =
         RCC_USART234578CLKSOURCE_PLL3;
     if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK) {
