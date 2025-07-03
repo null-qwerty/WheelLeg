@@ -72,6 +72,10 @@ __weak void vTaskLeftJointTransmit(void *pvParameters);
  */
 __weak void vTaskRightJointTransmit(void *pvParameters);
 
+__weak void vTaskImu(void *pvParameters);
+
+__weak void vTaskImuTempHold(void *pvParameters);
+
 extern xTaskHandle ledTaskHandle;
 
 extern xTaskHandle readDbusTaskHandle;
@@ -82,6 +86,9 @@ extern xTaskHandle wheelControlTaskHandle;
 extern xTaskHandle jointInitTaskHandle;
 extern xTaskHandle lJointTransmitTaskHandle;
 extern xTaskHandle rJointTransmitTaskHandle;
+
+extern xTaskHandle imuTaskHandle;
+extern xTaskHandle imuTempHoldHandle;
 
 extern SemaphoreHandle_t wheelControlMutex;
 

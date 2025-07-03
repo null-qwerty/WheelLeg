@@ -19,5 +19,9 @@ void WheelLegTasksInit(void)
                 osPriorityAboveNormal, &lJointTransmitTaskHandle);
     xTaskCreate(vTaskRightJointTransmit, "jointTransmitTask", 128 * 2, NULL,
                 osPriorityAboveNormal, &rJointTransmitTaskHandle);
+    xTaskCreate(vTaskImu, "ImuTask", 128 * 2, NULL, osPriorityNormal,
+                &imuTaskHandle);
+    xTaskCreate(vTaskImuTempHold, "imuTempHoldTask", 128 * 2, NULL,
+                osPriorityNormal, &imuTempHoldHandle);
     return;
 }
