@@ -4,6 +4,8 @@
 
 #include "Math/Vector.hpp"
 
+#include "Utils/Status.hpp"
+
 /**
  * @brief 五连杆并联腿机构
  *
@@ -15,18 +17,26 @@
 class Leg {
 public:
     struct State {
-        float phi0;
-        float l0;
+        float theta;
+        float theta_dot;
+        float x;
+        float x_dot;
+        float phi;
+        float phi_dot;
+        float l;
+        Status status;
     };
     Leg(Joint &frontJoint, Joint &backJoint, Wheel &wheel);
     Leg &init();
 
-    Leg &setParam(float l1, float l2, float l3, float l4, float l5);
+    Leg &setLegLenth(float l1, float l2, float l3, float l4, float l5);
+    Leg &setLinearzationParam(Matrix<12, 6> p);
     Leg &setJointLimit(float maxAngle, float minAngle);
-    Leg &setVirtualTorque(float vertical, float horizontal);
-    Leg &setWheelTorque(float torque);
 
-    State &getState();
+    State &getCurrentState();
+    State &getTargetState();
+
+    Leg &calculateTotalTorque();
 
 private:
     Joint &frontJoint, &backJoint;
@@ -36,9 +46,17 @@ private:
     float phi1, phi2, phi3, phi4;
     Vector2f A, B, C, D, E;
 
-    State state;
+    State current_state, target_state;
+    Vector6f X;
+    Matrix<2, 6> K;
+    Matrix<12, 6> pk;
+    Vector2f u;
+    Vector2f u_balance;
+
     float angleLimitMax, angleLimitMin;
     float frontJointHorizonAngle, backJointHorizonAngle;
 
     Leg &calculateCurrentState();
+    Leg &transformToJointTorque(Vector2f &u);
+    Matrix<2, 6> &calculateK();
 };
