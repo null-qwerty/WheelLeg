@@ -5,23 +5,32 @@
 void WheelLegTasksInit(void)
 {
     /* 创建任务 */
-    xTaskCreate(vTaskLed, "ledTask", 128 * 2, NULL, osPriorityNormal,
+    xTaskCreate(vTaskLed, "led", 128 * 2, NULL, osPriorityNormal,
                 &ledTaskHandle);
-    xTaskCreate(vTaskReadDbus, "readDbusTask", 128 * 2, NULL,
-                osPriorityAboveNormal, &readDbusTaskHandle);
-    xTaskCreate(vTaskWheelReceive, "wheelReceiveTask", 128 * 2, NULL,
-                osPriorityAboveNormal, &wheelReceiveTaskHandle);
-    xTaskCreate(vTaskWheelControl, "wheelControlTask", 128 * 2, NULL,
-                osPriorityAboveNormal, &wheelControlTaskHandle);
-    xTaskCreate(vTaskJointInit, "jointInitTask", 128 * 2, NULL,
+    xTaskCreate(vTaskReadDbus, "readDbus", 128 * 2, NULL, osPriorityAboveNormal,
+                &readDbusTaskHandle);
+    xTaskCreate(vTaskWheelReceive, "wheelReceive", 128 * 2, NULL,
+                osPriorityHigh, &wheelReceiveTaskHandle);
+    xTaskCreate(vTaskWheelControl, "wheelControl", 128 * 2, NULL,
+                osPriorityHigh, &wheelControlTaskHandle);
+    xTaskCreate(vTaskJointInit, "jointInit", 128 * 2, NULL,
                 osPriorityAboveNormal, &jointInitTaskHandle);
-    xTaskCreate(vTaskLeftJointTransmit, "jointTransmitTask", 128 * 2, NULL,
-                osPriorityAboveNormal, &lJointTransmitTaskHandle);
-    xTaskCreate(vTaskRightJointTransmit, "jointTransmitTask", 128 * 2, NULL,
-                osPriorityAboveNormal, &rJointTransmitTaskHandle);
-    xTaskCreate(vTaskImu, "ImuTask", 128 * 2, NULL, osPriorityNormal,
-                &imuTaskHandle);
-    xTaskCreate(vTaskImuTempHold, "imuTempHoldTask", 128 * 2, NULL,
-                osPriorityNormal, &imuTempHoldHandle);
+    xTaskCreate(vTaskLeftJointTransmit, "ljointTransmit", 128 * 2, NULL,
+                osPriorityHigh, &lJointTransmitTaskHandle);
+    xTaskCreate(vTaskRightJointTransmit, "rjointTransmit", 128 * 2, NULL,
+                osPriorityHigh, &rJointTransmitTaskHandle);
+    xTaskCreate(vTaskLeftJointEncode, "lJointEncode", 128 * 2, NULL,
+                osPriorityHigh, &lJointEncodeHandle);
+    xTaskCreate(vTaskRightJointEncode, "rJointEncode", 128 * 2, NULL,
+                osPriorityHigh, &rJointEncodeHandle);
+    xTaskCreate(vTaskChassisInit, "ChassisInit", 128 * 4, NULL,
+                osPriorityAboveNormal, &legInitHandle);
+    xTaskCreate(vTaskChassisControl, "ChassisControl", 128 * 2, NULL,
+                osPriorityHigh, &legControllHandle);
+    xTaskCreate(vTaskChassisDeinit, "ChassisDeinit", 128 * 2, NULL,
+                osPriorityAboveNormal, &legDeinitTaskHandle);
+    xTaskCreate(vTaskImu, "Imu", 128 * 2, NULL, osPriorityHigh, &imuTaskHandle);
+    xTaskCreate(vTaskImuTempHold, "imuTempHold", 128 * 2, NULL,
+                osPriorityAboveNormal, &imuTempHoldHandle);
     return;
 }
