@@ -72,9 +72,19 @@ __weak void vTaskLeftJointTransmit(void *pvParameters);
  */
 __weak void vTaskRightJointTransmit(void *pvParameters);
 
+__weak void vTaskLeftJointEncode(void *pvParameters);
+
+__weak void vTaskRightJointEncode(void *pvParameters);
+
 __weak void vTaskImu(void *pvParameters);
 
 __weak void vTaskImuTempHold(void *pvParameters);
+
+__weak void vTaskChassisInit(void *pvParameters);
+
+__weak void vTaskChassisControl(void *pvParameters);
+
+__weak void vTaskChassisDeinit(void *pvParameters);
 
 extern xTaskHandle ledTaskHandle;
 
@@ -86,9 +96,15 @@ extern xTaskHandle wheelControlTaskHandle;
 extern xTaskHandle jointInitTaskHandle;
 extern xTaskHandle lJointTransmitTaskHandle;
 extern xTaskHandle rJointTransmitTaskHandle;
+extern xTaskHandle lJointEncodeHandle;
+extern xTaskHandle rJointEncodeHandle;
 
 extern xTaskHandle imuTaskHandle;
 extern xTaskHandle imuTempHoldHandle;
+
+extern xTaskHandle legInitHandle;
+extern xTaskHandle legControllHandle;
+extern xTaskHandle legDeinitTaskHandle;
 
 extern SemaphoreHandle_t wheelControlMutex;
 
@@ -102,3 +118,5 @@ extern RM3508 leftWheel, rightWheel;
 extern UART lLegConnectivity, rLegConnectivity;
 
 extern UnitreeA1 lfJoint, lbJoint, rfJoint, rbJoint;
+
+extern float chassis_omega, chassis_target_x;
