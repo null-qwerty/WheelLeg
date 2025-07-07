@@ -12,7 +12,7 @@ Vector3f chassis_gyro, chassis_accel;
 xTaskHandle imuTaskHandle;
 xTaskHandle imuTempHoldHandle;
 
-Mahony mahony(1000.0f);
+Mahony mahony(1000.0f, 10.f, 0.001f);
 SPI imuConnectivity(&hspi2, SPI::dmaOption::RX);
 BMI088 imu(imuConnectivity);
 
@@ -23,6 +23,9 @@ void vTaskImu(void *pvParameters)
 {
     TickType_t xLastWakeTime = xTaskGetTickCount();
     TickType_t xFrequency = pdMS_TO_TICKS(1);
+
+    Quaternion transform;
+    transform.fromEulerAngles(PI, 0.0f, 0.0f);
 
     imu.init();
 
@@ -52,7 +55,8 @@ void vTaskImu(void *pvParameters)
         chassis_accel[2] = imu_data->accel.z;
 
         chassis_eular_angle =
-            mahony.update(chassis_gyro, chassis_accel).toEulerAngles();
+            (mahony.update(chassis_gyro, chassis_accel) * transform)
+                .toEulerAngles();
 
         mahony.yawZeroDriftOffset(5.32213e-7);
 
