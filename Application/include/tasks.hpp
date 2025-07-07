@@ -86,6 +86,8 @@ __weak void vTaskChassisControl(void *pvParameters);
 
 __weak void vTaskChassisDeinit(void *pvParameters);
 
+__weak void vTaskChassisStateUpdate(void *pvParameters);
+
 extern xTaskHandle ledTaskHandle;
 
 extern xTaskHandle readDbusTaskHandle;
@@ -105,6 +107,7 @@ extern xTaskHandle imuTempHoldHandle;
 extern xTaskHandle legInitHandle;
 extern xTaskHandle legControllHandle;
 extern xTaskHandle legDeinitTaskHandle;
+extern xTaskHandle legStateUpdateHandle;
 
 extern SemaphoreHandle_t wheelControlMutex;
 
@@ -120,3 +123,7 @@ extern UART lLegConnectivity, rLegConnectivity;
 extern UnitreeA1 lfJoint, lbJoint, rfJoint, rbJoint;
 
 extern float chassis_omega, chassis_target_x;
+
+#include "Math/Vector.hpp"
+
+extern Vector3f chassis_eular_angle;

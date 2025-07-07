@@ -27,10 +27,12 @@ void WheelLegTasksInit(void)
                 osPriorityAboveNormal, &legInitHandle);
     xTaskCreate(vTaskChassisControl, "ChassisControl", 128 * 2, NULL,
                 osPriorityHigh, &legControllHandle);
-    xTaskCreate(vTaskChassisDeinit, "ChassisDeinit", 128 * 2, NULL,
+    xTaskCreate(vTaskChassisDeinit, "ChassisDeinit", 128, NULL,
                 osPriorityAboveNormal, &legDeinitTaskHandle);
+    xTaskCreate(vTaskChassisStateUpdate, "ChassisStateUpdate", 128 * 2, NULL,
+                osPriorityHigh, &legStateUpdateHandle);
     xTaskCreate(vTaskImu, "Imu", 128 * 2, NULL, osPriorityHigh, &imuTaskHandle);
-    xTaskCreate(vTaskImuTempHold, "imuTempHold", 128 * 2, NULL,
+    xTaskCreate(vTaskImuTempHold, "imuTempHold", 128, NULL,
                 osPriorityAboveNormal, &imuTempHoldHandle);
     return;
 }
