@@ -26,25 +26,27 @@ void vTaskWheelReceive(void *pvParameters)
     vTaskDelete(wheelReceiveTaskHandle);
 }
 
-pidController lwslc(6000., 0., 1., 200000, -200000);
-pidController rwslc(6000., 0., 1., 200000, -200000);
+// pidController lwslc(6000., 0., 1., 200000, -200000);
+// pidController rwslc(6000., 0., 1., 200000, -200000);
 
 void vTaskWheelControl(void *pvParameters)
 {
     leftWheel.init();
     rightWheel.init();
-    leftWheel.getSpeedLoopController() = &lwslc;
-    rightWheel.getSpeedLoopController() = &rwslc;
+    // leftWheel.getSpeedLoopController() = &lwslc;
+    // rightWheel.getSpeedLoopController() = &rwslc;
 
     while (1) {
         // 接收从其他任务发出的信号量
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
 
-        if (xSemaphoreTake(wheelControlMutex, 1)) {
-            leftWheel.encodeControlMessage();
-            rightWheel.encodeControlMessage();
-            xSemaphoreGive(wheelControlMutex);
-        }
+        // if (xSemaphoreTake(wheelControlMutex, 1)) {
+        //     leftWheel.encodeControlMessage();
+        //     rightWheel.encodeControlMessage();
+        //     xSemaphoreGive(wheelControlMutex);
+        // }
+        leftWheel.encodeControlMessage();
+        rightWheel.encodeControlMessage();
 
         // 发送控制信息，若发送失败则重新初始化 CAN 线
         auto code = wheelConnectivity.sendMessage();
