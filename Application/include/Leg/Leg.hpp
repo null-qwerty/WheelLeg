@@ -29,6 +29,7 @@ public:
     };
     Leg(Joint &frontJoint, Joint &backJoint, Wheel &wheel, float dt);
     Leg &init();
+    Leg &deInit();
 
     Leg &setLegLenth(float l1, float l2, float l3, float l4, float l5);
     Leg &setLinearzationParam(Matrix<12, 6> p);
@@ -39,8 +40,11 @@ public:
 
     State &getCurrentState();
     State &getTargetState();
+    float getTheta();
+    float getHalfLegLengthRange();
 
     Leg &calculateTotalTorque();
+    Leg &calculateCurrentState();
 
 private:
     /* 执行器 */
@@ -58,6 +62,7 @@ private:
 
     /* 控制平衡状态的 LQR 控制器参数 */
     State current_state, target_state; ///< 当前状态和目标状态
+    State estimated_state;
     Vector6f X; ///< 状态向量 [theta, theta_dot, x, x_dot, phi, phi_dot]
     Vector6f X_d; ///< 期望状态向量 [0, 0, x_d, 0, 0, 0]
     Matrix<2, 6> K; ///< LQR 控制器增益矩阵
@@ -69,6 +74,7 @@ private:
     pidController leg_length_controller; ///< 为保证减震效果，K_p 应较小
     float leg_length_max;
     float leg_length_min;
+    float half_length_range;
     float F_leg_length; ///< 腿长控制力矩
     float F_roll_compensation; ///< 横滚角补偿力矩，补偿控制器误差
 
