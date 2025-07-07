@@ -3,10 +3,8 @@
 #include "BaseControl/Motor/UnitreeA1protocol.hpp"
 
 #include "Math/Trigonometric.hpp"
-#include "cmsis_os2.h"
-#include "projdefs.h"
+
 #include "tasks.hpp"
-#include "usart.h"
 
 void vTaskJointInit(void *pvParameters)
 {
@@ -17,7 +15,7 @@ void vTaskJointInit(void *pvParameters)
         auto receiveframe =
             (UART::xUARTFrame_t *)(connectivity.getReceiveFrame());
         sendframe->length = sizeof(sendData);
-        receiveframe->length = sizeof(receiveData);
+        receiveframe->length = sizeof(receiveData) * 2;
 
         sendframe->data[0] = (uint8_t *)pvPortMalloc(sendframe->length);
         sendframe->data[1] = (uint8_t *)pvPortMalloc(sendframe->length);
@@ -37,21 +35,18 @@ void vTaskJointInit(void *pvParameters)
 
     while (true) {
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-        lfJoint.init();
-        // lLegConnectivity.sendMessage();
-        osDelay(5);
-        lbJoint.init();
-        // lLegConnectivity.sendMessage();
-        osDelay(5);
-        rfJoint.init();
-        // rLegConnectivity.sendMessage();
-        osDelay(5);
-        rbJoint.init();
-        // rLegConnectivity.sendMessage();
-        osDelay(5);
 
-        xTaskNotifyGive(lJointTransmitTaskHandle);
+        rfJoint.init();
+        rbJoint.init();
         xTaskNotifyGive(rJointTransmitTaskHandle);
+        osDelay(50);
+
+        lfJoint.init();
+        lbJoint.init();
+        xTaskNotifyGive(lJointTransmitTaskHandle);
+        osDelay(50);
+
+        xTaskNotifyGive(legInitHandle);
     }
     // 释放内存
     auto deinitfunction = [&](Connectivity &connectivity) {
@@ -73,22 +68,21 @@ void vTaskLeftJointTransmit(void *pvParameters)
     ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
 
     TickType_t xLastWakeTime = xTaskGetTickCount();
-    TickType_t xFrequency = pdMS_TO_TICKS(4);
+    TickType_t xFrequency = pdMS_TO_TICKS(1);
 
     while (true) {
         lfJoint.encodeControlMessage();
         lLegConnectivity.sendMessage();
         // 由于 A1 电机是一问一答的，所以这里需要等待反馈数据
-        ulTaskNotifyTake(pdTRUE, 1);
+        vTaskDelayUntil(&xLastWakeTime, xFrequency);
 
         lbJoint.encodeControlMessage();
         lLegConnectivity.sendMessage();
-        ulTaskNotifyTake(pdTRUE, 1);
         // 任务定频执行
         //! 不一定能够定频，因为与中断有关。这里应该给一个宽松的时间，保证长于上面等待信号量的时间。
         //* 4.8M 波特率，一次发送 34 字节，接收 78 字节，1 停止位无校验位：
         //* 1 / 4800000 * 10 * (78 + 34) = 0.000233s = 0.233ms
-        //* 再考虑其他函数的执行时间，2ms 应该够用。
+        //* 再考虑其他函数的执行时间，1ms 应该够用。
         //* 右侧电机的发送任务也是一样的。
         vTaskDelayUntil(&xLastWakeTime, xFrequency);
     }
@@ -100,20 +94,73 @@ void vTaskRightJointTransmit(void *pvParameters)
     ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
 
     TickType_t xLastWakeTime = xTaskGetTickCount();
-    TickType_t xFrequency = pdMS_TO_TICKS(4);
+    TickType_t xFrequency = pdMS_TO_TICKS(1);
 
     while (true) {
         rfJoint.encodeControlMessage();
         rLegConnectivity.sendMessage();
-        ulTaskNotifyTake(pdTRUE, 1);
+        vTaskDelayUntil(&xLastWakeTime, xFrequency);
 
         rbJoint.encodeControlMessage();
         rLegConnectivity.sendMessage();
-        ulTaskNotifyTake(pdTRUE, 1);
 
         vTaskDelayUntil(&xLastWakeTime, xFrequency);
     }
     vTaskDelete(rJointTransmitTaskHandle);
+}
+
+void vTaskLeftJointEncode(void *pvParameters)
+{
+    while (1) {
+        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+        xTaskNotifyGive(lJointTransmitTaskHandle);
+
+        auto receiveframe =
+            (UART::xUARTFrame_t *)(lLegConnectivity.getReceiveFrame());
+        auto readindex = receiveframe->readIndex;
+        auto receiveBuffer = (receiveData *)(receiveframe->data[readindex]);
+        if (receiveBuffer[0].header.start == 0xeefe &&
+            receiveBuffer[0].crc ==
+                UnitreeA1::crc32_core((uint32_t *)(&receiveBuffer[0]), 18)) {
+            lfJoint.decodeFeedbackMessage();
+            lbJoint.decodeFeedbackMessage();
+        }
+        if (receiveBuffer[1].header.start == 0xeefe &&
+            receiveBuffer[1].crc ==
+                UnitreeA1::crc32_core((uint32_t *)(&receiveBuffer[1]), 18)) {
+            lfJoint.decodeFeedbackMessage();
+            lbJoint.decodeFeedbackMessage();
+        }
+    }
+
+    vTaskDelete(lJointEncodeHandle);
+}
+
+void vTaskRightJointEncode(void *pvParameters)
+{
+    while (1) {
+        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+        xTaskNotifyGive(rJointTransmitTaskHandle);
+
+        auto receiveframe =
+            (UART::xUARTFrame_t *)(rLegConnectivity.getReceiveFrame());
+        auto readindex = receiveframe->readIndex;
+        auto receiveBuffer = (receiveData *)(receiveframe->data[readindex]);
+        if (receiveBuffer[0].header.start == 0xeefe &&
+            receiveBuffer[0].crc ==
+                UnitreeA1::crc32_core((uint32_t *)(&receiveBuffer[0]), 18)) {
+            rfJoint.decodeFeedbackMessage();
+            rbJoint.decodeFeedbackMessage();
+        }
+        if (receiveBuffer[1].header.start == 0xeefe &&
+            receiveBuffer[1].crc ==
+                UnitreeA1::crc32_core((uint32_t *)(&receiveBuffer[1]), 18)) {
+            rfJoint.decodeFeedbackMessage();
+            rbJoint.decodeFeedbackMessage();
+        }
+    }
+
+    vTaskDelete(rJointEncodeHandle);
 }
 
 void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
@@ -122,30 +169,19 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
         if (huart->hdmarx->Init.Mode == DMA_CIRCULAR) {
             HAL_UART_DMAStop(huart);
         }
-        // 解析反馈数据，函数内部会进行筛选，所以都调用一次
-        lfJoint.decodeFeedbackMessage();
-        lbJoint.decodeFeedbackMessage();
-
-        BaseType_t xHigherPriorityTaskWoken = pdTRUE;
-        // 解析完后通知任务，发送下一个电机的控制数据
-        vTaskNotifyGiveFromISR(lJointTransmitTaskHandle,
-                               &xHigherPriorityTaskWoken);
-        // 开启接收下一次数据
+        // 开启下一次读取
         lLegConnectivity.receiveMessage();
+        // 通知解析任务
+        BaseType_t xHigherPriorityTaskWoken = pdTRUE;
+        vTaskNotifyGiveFromISR(lJointEncodeHandle, &xHigherPriorityTaskWoken);
     } else if (huart == &huart3 && Size == sizeof(receiveData)) {
         if (huart->hdmarx->Init.Mode == DMA_CIRCULAR) {
             HAL_UART_DMAStop(huart);
         }
-
-        rfJoint.decodeFeedbackMessage();
-        rbJoint.decodeFeedbackMessage();
+        rLegConnectivity.receiveMessage();
 
         BaseType_t xHigherPriorityTaskWoken = pdTRUE;
-
-        vTaskNotifyGiveFromISR(rJointTransmitTaskHandle,
-                               &xHigherPriorityTaskWoken);
-
-        rLegConnectivity.receiveMessage();
+        vTaskNotifyGiveFromISR(rJointEncodeHandle, &xHigherPriorityTaskWoken);
     }
     // 切换上下文，如果有更高优先级的任务需要执行，就立即执行
     portYIELD_FROM_ISR(pdTRUE);
@@ -154,15 +190,17 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
 xTaskHandle jointInitTaskHandle;
 xTaskHandle lJointTransmitTaskHandle;
 xTaskHandle rJointTransmitTaskHandle;
+xTaskHandle lJointEncodeHandle;
+xTaskHandle rJointEncodeHandle;
 
-UART lLegConnectivity(&huart2, UART::dmaOption::RX);
-UART rLegConnectivity(&huart3, UART::dmaOption::RX);
+UART lLegConnectivity(&huart2, UART::dmaOption::RX_TX);
+UART rLegConnectivity(&huart3, UART::dmaOption::RX_TX);
 
 uint8_t jointOption = Motor::MotorOption::MOTOR_SOFT_LIMIT |
                       Motor::MotorOption::MOTOR_SOFT_ZERO;
 Motor::MotorOptionData jointOptionData = {
-    .soft_limit_min = DEGREE_TO_RAND(-15.0f),
-    .soft_limit_max = DEGREE_TO_RAND(45.0f),
+    .soft_limit_min = DEGREE_TO_RAND(-20.0f),
+    .soft_limit_max = DEGREE_TO_RAND(41.0f),
     .soft_zero = 0.0f,
 };
 
